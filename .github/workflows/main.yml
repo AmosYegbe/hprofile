@@ -30,38 +30,35 @@ jobs:
     # Run sonar-scanner
       - name: SonarQube Scan
         run: sonar-scanner
-             -Dsonar.host.url=${{ secrets.SONAR_URL }}
-             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-             -Dsonar.organization=${{ secrets.ORGANIZATION }}
-             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }}
-             -Dsonar.sources=src/
-             -Dsonar.junit.reportsPath=target/surefire-reports/ 
-             -Dsonar.jacoco.reportsPath=target/jacoco.exec 
-             -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
-             -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/
-       # Check the Quality Gate status.
+            -Dsonar.host.url=${{ secrets.SONAR_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.organization=${{ secrets.ORGANIZATION }}
+            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }}
+            -Dsonar.sources=src/
+            -Dsonar.junit.reportsPath=target/surefire-reports/ 
+            -Dsonar.jacoco.reportsPath=target/jacoco.exec 
+            -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
+            -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/
+      # Check the Quality Gate status.
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
       # Force to fail step after specific time.
         timeout-minutes: 5
         env:
-         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-         SONAR_HOST_URL: ${{ secrets.SONAR_URL }} #OPTIONAL
-    BUILD & PUBLISH:
-      needs: Testing
-      runs-on: ubuntu-latest
-      steps:
-        - name: Code checkout
-          uses: actions/checkout@v4
-        - name: Update application.properties file
-          run:
-            sed -i "s/^jdbc.username.*$/jdbc.username\=${{ secrets.RDS_USER }}/" src/main/resources/application.properties
-            sed -i "s/^jdbc.password.*$/jdbc.password\=${{ secrets.RDS_PASS }}/" src/main/resources/application.properties
-            sed -i "s/db01/${{ secrets.RDS_ENDPOINT }}/" src/main/resources/application.properties
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_URL }} #OPTIONAL
+BUILD & PUBLISH:
+  needs: Testing
+  runs-on: ubuntu-latest
+  steps:
+    - name: Code checkout
+      uses: actions/checkout@v4
+    - name: Update application.properties file
+      run:
+        sed -i "s/^jdbc.username.*$/jdbc.username\=${{ secrets.RDS_USER }}/" src/main/resources/application.properties
+        sed -i "s/^jdbc.password.*$/jdbc.password\=${{ secrets.RDS_PASS }}/" src/main/resources/application.properties
+        sed -i "s/db01/${{ secrets.RDS_ENDPOINT }}/" src/main/resources/application.properties
 
-        - name: Build and Upload Image to ECR
-          run:
-
-            
-
+   # - name: Build and Upload Image to ECR
+    #  run:
